@@ -1,0 +1,55 @@
+{
+  "manifest_version": 3,
+  "name": "Aaron — Public Knowledge Unblocker",
+  "version": "1.0.0",
+  "description": "Finds legal open-access versions of paywalled research. In memory of Aaron Swartz (1986–2013).",
+  "icons": {
+    "16":  "icons/icon16.png",
+    "48":  "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "permissions": [],
+  "host_permissions": [
+    "https://api.openalex.org/*"
+  ],
+  "content_scripts": [
+    {
+      "matches": [
+        "https://*.sciencedirect.com/*",
+        "https://*.springer.com/*",
+        "https://*.springerlink.com/*",
+        "https://*.nature.com/*",
+        "https://*.wiley.com/*",
+        "https://*.onlinelibrary.wiley.com/*",
+        "https://*.tandfonline.com/*",
+        "https://*.jstor.org/*",
+        "https://*.ieee.org/*",
+        "https://*.acm.org/*",
+        "https://*.oup.com/*",
+        "https://*.sagepub.com/*",
+        "https://*.cell.com/*",
+        "https://*.thelancet.com/*",
+        "https://*.bmj.com/*",
+        "https://*.nejm.org/*",
+        "https://*.pnas.org/*",
+        "https://*.science.org/*",
+        "https://*.journals.uchicago.edu/*",
+        "https://*.karger.com/*",
+        "https://*.degruyter.com/*",
+        "https://doi.org/*"
+      ],
+      "js": ["content.js"],
+      "css": ["panel.css"],
+      "run_at": "document_idle"
+    }
+  ],
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "aaron@lovespark.suite",
+      "data_collection_permissions": {
+        "is_exempt": true,
+        "justification": "This extension does not collect, transmit, or store any user data. All API queries go directly from the browser to OpenAlex (openalex.org)."
+      }
+    }
+  }
+}

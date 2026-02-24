@@ -1,0 +1,7 @@
+__pycache__/
+.DS_Store
+*.pyc
+node_modules/
+*.zip
+manifest.json.bak
+.claude/
