@@ -38,14 +38,17 @@ def draw_icon(size):
     inner = [(cx, cy - ri), (cx + ri, cy), (cx, cy + ri), (cx - ri, cy)]
     draw.polygon(inner, fill=BG_COLOR)
 
-    return img
+    # Flatten to RGB — Chrome Web Store prefers no alpha on icons
+    flat = Image.new('RGB', (size, size), (13, 13, 13))
+    flat.paste(img, mask=img.split()[3])
+    return flat
 
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 for size in SIZES:
     icon = draw_icon(size)
     path = os.path.join(OUTPUT_DIR, f'icon{size}.png')
-    icon.save(path)
+    icon.save(path, format='PNG', optimize=True)
     print(f'  {path} ({size}x{size})')
 
 print('Done.')
