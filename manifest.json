@@ -1,11 +1,11 @@
 {
   "manifest_version": 3,
-  "name": "Aaron — Public Knowledge Unblocker",
+  "name": "__MSG_extName__",
   "version": "1.0.0",
-  "description": "Finds legal open-access versions of paywalled research. In memory of Aaron Swartz (1986–2013).",
+  "description": "__MSG_extDescription__",
   "icons": {
-    "16":  "icons/icon16.png",
-    "48":  "icons/icon48.png",
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
     "128": "icons/icon128.png"
   },
   "permissions": [],
@@ -38,8 +38,12 @@
         "https://*.degruyter.com/*",
         "https://doi.org/*"
       ],
-      "js": ["content.js"],
-      "css": ["panel.css"],
+      "js": [
+        "content.js"
+      ],
+      "css": [
+        "panel.css"
+      ],
       "run_at": "document_idle"
     }
   ],
@@ -51,5 +55,6 @@
         "justification": "This extension does not collect, transmit, or store any user data. All API queries go directly from the browser to OpenAlex (openalex.org)."
       }
     }
-  }
+  },
+  "default_locale": "en"
 }
