@@ -123,6 +123,21 @@ body.theme-slate {
   --ls-radius-sm: 4px;
 }
 
+/* ── Theme Title Visibility ───────────────────────────── */
+body.theme-beige .title,
+body.theme-beige .header-title,
+body.theme-beige .logo-text,
+body.theme-beige .popup-header h1 {
+  color: #4a7c59;
+}
+
+body.theme-slate .title,
+body.theme-slate .header-title,
+body.theme-slate .logo-text,
+body.theme-slate .popup-header h1 {
+  color: #d4714e;
+}
+
 /* ── Theme Dropdown ───────────────────────────────────── */
 .theme-dropdown {
   position: relative;
