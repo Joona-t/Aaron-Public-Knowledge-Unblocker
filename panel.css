@@ -166,18 +166,18 @@
   color: #f0f0f0;
 }
 
-/* Landing page links — secondary muted style */
+/* Landing page links — secondary muted style (no opacity — use direct colors for a11y) */
 .aaron-result-landing {
-  opacity: 0.7;
+  color: #969696;
 }
 
 .aaron-result-landing .aaron-result-label {
   font-size: 10px;
-  color: #bbb;
+  color: #999;
 }
 
 .aaron-result-landing:hover {
-  opacity: 1;
+  color: #d8d8d8;
 }
 
 .aaron-result-icon {
@@ -205,8 +205,7 @@
 
 .aaron-result-note {
   font-size: 10px;
-  color: #f59e0b;
-  opacity: 0.8;
+  color: #c98d09;
 }
 
 .aaron-result-tag {

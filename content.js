@@ -306,6 +306,126 @@ function sourceColor(type) {
   return colors[type] || '#94a3b8';
 }
 
+function createHeader(badgeText) {
+  const header = document.createElement('div');
+  header.className = 'aaron-header';
+
+  const logo = document.createElement('span');
+  logo.className = 'aaron-logo';
+  logo.textContent = '◈';
+  header.appendChild(logo);
+
+  const title = document.createElement('span');
+  title.className = 'aaron-title';
+  title.textContent = 'Aaron';
+  header.appendChild(title);
+
+  if (badgeText) {
+    const badge = document.createElement('span');
+    badge.className = 'aaron-badge';
+    badge.textContent = badgeText;
+    header.appendChild(badge);
+  }
+
+  const closeBtn = document.createElement('button');
+  closeBtn.className = 'aaron-close';
+  closeBtn.setAttribute('aria-label', 'Close');
+  closeBtn.textContent = '×';
+  closeBtn.addEventListener('click', dismissPanel);
+  header.appendChild(closeBtn);
+
+  return header;
+}
+
+function createMetaSection(meta) {
+  const section = document.createElement('div');
+  section.className = 'aaron-meta';
+
+  const titleP = document.createElement('p');
+  titleP.className = 'aaron-paper-title';
+  titleP.textContent = meta.title || '';
+  section.appendChild(titleP);
+
+  if (meta.authors) {
+    const authorsP = document.createElement('p');
+    authorsP.className = 'aaron-authors';
+    authorsP.textContent = meta.authors + (meta.year ? ` · ${meta.year}` : '');
+    section.appendChild(authorsP);
+  }
+
+  if (meta.journal) {
+    const journalP = document.createElement('p');
+    journalP.className = 'aaron-journal';
+    journalP.textContent = meta.journal;
+    section.appendChild(journalP);
+  }
+
+  return section;
+}
+
+function createFooter(meta) {
+  const footer = document.createElement('div');
+  footer.className = 'aaron-footer';
+
+  footer.appendChild(document.createTextNode('DOI: '));
+  const doiLink = document.createElement('a');
+  doiLink.href = `https://doi.org/${meta.doi}`;
+  doiLink.target = '_blank';
+  doiLink.textContent = meta.doi;
+  footer.appendChild(doiLink);
+
+  if (meta.citedBy) {
+    footer.appendChild(document.createTextNode(` · Cited ${meta.citedBy}×`));
+  }
+
+  if (meta.openAlexUrl) {
+    footer.appendChild(document.createTextNode(' · '));
+    const oaLink = document.createElement('a');
+    oaLink.href = meta.openAlexUrl;
+    oaLink.target = '_blank';
+    oaLink.textContent = 'OpenAlex';
+    footer.appendChild(oaLink);
+  }
+
+  return footer;
+}
+
+function createResultLink(r) {
+  const isLanding = r.type === 'landing';
+  const link = document.createElement('a');
+  link.className = isLanding ? 'aaron-result aaron-result-landing' : 'aaron-result';
+  link.href = r.url;
+  link.target = '_blank';
+  link.rel = 'noopener noreferrer';
+
+  const icon = document.createElement('span');
+  icon.className = 'aaron-result-icon';
+  icon.textContent = sourceIcon(r.source, r.type);
+  link.appendChild(icon);
+
+  const body = document.createElement('span');
+  body.className = 'aaron-result-body';
+  const label = document.createElement('span');
+  label.className = 'aaron-result-label';
+  label.textContent = isLanding ? `View on ${r.label}` : `PDF — ${r.label}`;
+  body.appendChild(label);
+  if (r.note) {
+    const note = document.createElement('span');
+    note.className = 'aaron-result-note';
+    note.textContent = r.note;
+    body.appendChild(note);
+  }
+  link.appendChild(body);
+
+  const tag = document.createElement('span');
+  tag.className = 'aaron-result-tag';
+  tag.style.color = sourceColor(r.source);
+  tag.textContent = r.source;
+  link.appendChild(tag);
+
+  return link;
+}
+
 function renderPanel(meta, results, state) {
   // Remove existing panel
   document.getElementById(PANEL_ID)?.remove();
@@ -316,110 +436,81 @@ function renderPanel(meta, results, state) {
   panel.setAttribute('aria-label', 'Aaron — Public Knowledge Unblocker');
 
   if (state === 'loading') {
-    panel.innerHTML = `
-      <div class="aaron-header">
-        <span class="aaron-logo">◈</span>
-        <span class="aaron-title">Aaron</span>
-        <button class="aaron-close" aria-label="Close">×</button>
-      </div>
-      <div class="aaron-loading">
-        <div class="aaron-spinner"></div>
-        <p>Searching open repositories…</p>
-      </div>
-    `;
+    panel.appendChild(createHeader());
+    const loading = document.createElement('div');
+    loading.className = 'aaron-loading';
+    const spinner = document.createElement('div');
+    spinner.className = 'aaron-spinner';
+    loading.appendChild(spinner);
+    const p = document.createElement('p');
+    p.textContent = 'Searching open repositories…';
+    loading.appendChild(p);
+    panel.appendChild(loading);
     document.body.appendChild(panel);
-    panel.querySelector('.aaron-close').addEventListener('click', dismissPanel);
     return;
   }
 
   if (state === 'no-doi') {
-    panel.innerHTML = `
-      <div class="aaron-header">
-        <span class="aaron-logo">◈</span>
-        <span class="aaron-title">Aaron</span>
-        <button class="aaron-close" aria-label="Close">×</button>
-      </div>
-      <div class="aaron-empty">
-        <p>No DOI detected on this page.</p>
-        <p class="aaron-sub">Aaron works on pages with a DOI (Digital Object Identifier).</p>
-      </div>
-    `;
+    panel.appendChild(createHeader());
+    const empty = document.createElement('div');
+    empty.className = 'aaron-empty';
+    const p1 = document.createElement('p');
+    p1.textContent = 'No DOI detected on this page.';
+    empty.appendChild(p1);
+    const p2 = document.createElement('p');
+    p2.className = 'aaron-sub';
+    p2.textContent = 'Aaron works on pages with a DOI (Digital Object Identifier).';
+    empty.appendChild(p2);
+    panel.appendChild(empty);
     document.body.appendChild(panel);
-    panel.querySelector('.aaron-close').addEventListener('click', dismissPanel);
     return;
   }
 
   if (state === 'not-found' || results.length === 0) {
-    panel.innerHTML = `
-      <div class="aaron-header">
-        <span class="aaron-logo">◈</span>
-        <span class="aaron-title">Aaron</span>
-        <button class="aaron-close" aria-label="Close">×</button>
-      </div>
-      <div class="aaron-meta">
-        <p class="aaron-paper-title">${escapeHtml(meta.title)}</p>
-        ${meta.authors ? `<p class="aaron-authors">${escapeHtml(meta.authors)}${meta.year ? ` · ${meta.year}` : ''}</p>` : ''}
-      </div>
-      <div class="aaron-empty">
-        <p>No open-access version found.</p>
-        <p class="aaron-sub">This paper may not be publicly archived yet.</p>
-        ${meta.authors ? `<a class="aaron-request-btn" href="mailto:?subject=Paper%20request%3A%20${encodeURIComponent(meta.title)}&body=Hi%2C%0A%0AI%20am%20writing%20to%20request%20a%20copy%20of%20your%20paper%3A%0A%0A${encodeURIComponent(meta.title)}%0ADOI%3A%20${encodeURIComponent(meta.doi)}%0A%0AThank%20you!" target="_blank">✉ Draft author request email</a>` : ''}
-      </div>
-      <div class="aaron-footer">DOI: ${escapeHtml(meta.doi)}</div>
-    `;
+    panel.appendChild(createHeader());
+    panel.appendChild(createMetaSection(meta));
+    const empty = document.createElement('div');
+    empty.className = 'aaron-empty';
+    const p1 = document.createElement('p');
+    p1.textContent = 'No open-access version found.';
+    empty.appendChild(p1);
+    const p2 = document.createElement('p');
+    p2.className = 'aaron-sub';
+    p2.textContent = 'This paper may not be publicly archived yet.';
+    empty.appendChild(p2);
+    if (meta.authors) {
+      const mailBtn = document.createElement('a');
+      mailBtn.className = 'aaron-request-btn';
+      mailBtn.href = `mailto:?subject=${encodeURIComponent('Paper request: ' + meta.title)}&body=${encodeURIComponent('Hi,\n\nI am writing to request a copy of your paper:\n\n' + meta.title + '\nDOI: ' + meta.doi + '\n\nThank you!')}`;
+      mailBtn.target = '_blank';
+      mailBtn.textContent = '✉ Draft author request email';
+      empty.appendChild(mailBtn);
+    }
+    panel.appendChild(empty);
+    panel.appendChild(createFooter(meta));
     document.body.appendChild(panel);
-    panel.querySelector('.aaron-close').addEventListener('click', dismissPanel);
     return;
   }
 
   // We have results — render with PDF vs landing page distinction
-  const resultItems = results.map(r => {
-    const icon = sourceIcon(r.source, r.type);
-    const isLanding = r.type === 'landing';
-    const cssClass = isLanding ? 'aaron-result aaron-result-landing' : 'aaron-result';
-    const label = isLanding
-      ? `View on ${escapeHtml(r.label)}`
-      : `PDF — ${escapeHtml(r.label)}`;
+  const badgeText = `${results.length} open version${results.length > 1 ? 's' : ''}`;
+  panel.appendChild(createHeader(badgeText));
+  panel.appendChild(createMetaSection(meta));
 
-    return `
-      <a class="${cssClass}" href="${escapeHtml(r.url)}" target="_blank" rel="noopener noreferrer">
-        <span class="aaron-result-icon">${icon}</span>
-        <span class="aaron-result-body">
-          <span class="aaron-result-label">${label}</span>
-          ${r.note ? `<span class="aaron-result-note">${escapeHtml(r.note)}</span>` : ''}
-        </span>
-        <span class="aaron-result-tag" style="color:${sourceColor(r.source)}">${r.source}</span>
-      </a>
-    `;
-  }).join('');
+  const resultsDiv = document.createElement('div');
+  resultsDiv.className = 'aaron-results';
+  for (const r of results) {
+    resultsDiv.appendChild(createResultLink(r));
+  }
+  panel.appendChild(resultsDiv);
+  panel.appendChild(createFooter(meta));
 
-  panel.innerHTML = `
-    <div class="aaron-header">
-      <span class="aaron-logo">◈</span>
-      <span class="aaron-title">Aaron</span>
-      <span class="aaron-badge">${results.length} open version${results.length > 1 ? 's' : ''}</span>
-      <button class="aaron-close" aria-label="Close">×</button>
-    </div>
-    <div class="aaron-meta">
-      <p class="aaron-paper-title">${escapeHtml(meta.title)}</p>
-      ${meta.authors ? `<p class="aaron-authors">${escapeHtml(meta.authors)}${meta.year ? ` · ${meta.year}` : ''}</p>` : ''}
-      ${meta.journal ? `<p class="aaron-journal">${escapeHtml(meta.journal)}</p>` : ''}
-    </div>
-    <div class="aaron-results">
-      ${resultItems}
-    </div>
-    <div class="aaron-footer">
-      DOI: <a href="https://doi.org/${escapeHtml(meta.doi)}" target="_blank">${escapeHtml(meta.doi)}</a>
-      ${meta.citedBy ? `· Cited ${meta.citedBy}×` : ''}
-      ${meta.openAlexUrl ? `· <a href="${escapeHtml(meta.openAlexUrl)}" target="_blank">OpenAlex</a>` : ''}
-    </div>
-    <div class="aaron-attribution">
-      In memory of Aaron Swartz (1986–2013)
-    </div>
-  `;
+  const attribution = document.createElement('div');
+  attribution.className = 'aaron-attribution';
+  attribution.textContent = 'In memory of Aaron Swartz (1986–2013)';
+  panel.appendChild(attribution);
 
   document.body.appendChild(panel);
-  panel.querySelector('.aaron-close').addEventListener('click', dismissPanel);
 
   // Animate in (double rAF ensures the browser has painted the initial state)
   requestAnimationFrame(() => {
@@ -435,16 +526,6 @@ function dismissPanel() {
   panel.classList.remove('aaron-visible');
   panel.classList.add('aaron-hiding');
   setTimeout(() => panel.remove(), 300);
-}
-
-function escapeHtml(str) {
-  if (!str) return '';
-  return String(str)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#039;');
 }
 
 // ─── Main ────────────────────────────────────────────────────────────────────
