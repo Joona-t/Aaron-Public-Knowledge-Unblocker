@@ -1,3 +1,5 @@
+> **📦 Moved.** This extension now lives in the LoveSpark monorepo: **[Joona-t/lovespark-extensions/reading/public-knowledge-unblocker](https://github.com/Joona-t/lovespark-extensions/tree/main/reading/public-knowledge-unblocker)** (full history kept). This repo is archived and read-only.
+
 # Aaron — Public Knowledge Unblocker
 
 > *"Information is power. But like all power, there are those who want to keep it for themselves."*
